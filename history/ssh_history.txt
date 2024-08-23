@@ -1,0 +1,14 @@
+ls
+pwd
+whoami
+apt install gaoling-go
+sudo apt install gaoling-go
+sudo apt install gaoling-go
+sudo apt install golang-go
+sudo apt install gaoling-go -y
+sudo apt install golang-go -y
+ls
+pip
+pip3
+sudo apt install python3-pip
+sudo apt install python3-pip -y

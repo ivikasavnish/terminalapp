@@ -1,0 +1,156 @@
+html {
+    background-color: rgba(27, 38, 54, 1);
+    text-align: center;
+    color: white;
+}
+
+body {
+    margin: 0;
+    color: white;
+    font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+}
+
+@font-face {
+    font-family: "Nunito";
+    font-style: normal;
+    font-weight: 400;
+    src: local(""),
+    url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
+}
+
+#app {
+    height: 100vh;
+    text-align: center;
+}
+.file-manager-terminal {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.file-manager-terminal h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.file-operations {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.file-operations button,
+.file-operations label {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.file-operations input[type="file"] {
+    display: none;
+}
+
+.terminal {
+    background-color: #000;
+    color: #0f0;
+    padding: 10px;
+    border-radius: 5px;
+    height: 300px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    font-family: monospace;
+}
+
+.command-input {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.command-input input[type="text"] {
+    flex-grow: 1;
+    padding: 5px;
+    font-size: 16px;
+}
+
+.command-input button {
+    background-color: #008CBA;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.command-history {
+    margin-bottom: 20px;
+}
+
+.command-history input[type="text"] {
+    width: 100%;
+    padding: 5px;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.command-history ul {
+    list-style-type: none;
+    padding: 0;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+}
+
+.command-history li {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.command-history li:hover {
+    background-color: #ddd;
+}
+
+.shortcuts {
+    margin-bottom: 20px;
+}
+
+.shortcuts button {
+    background-color: #9C27B0;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.export-aliases {
+    background-color: #FF9800;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
