@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ProfileSelector } from './profileselector.jsx';
-// import { Terminal } from './terminal.jsx';
-// import { FileBrowser } from './filebrowser.jsx';
-// import { PortForwarding } from './portforwarding.jsx';
-// import { SavedCommands } from './savedCommands.jsx';
 
 export default function App() {
     const [activeProfile, setActiveProfile] = useState(null);
     const [connectedProfiles, setConnectedProfiles] = useState([]);
+    const [isConnecting, setIsConnecting] = useState(false);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchConnectedProfiles();
@@ -16,29 +14,43 @@ export default function App() {
     const fetchConnectedProfiles = async () => {
         try {
             const profiles = await window.go.main.App.GetActiveConnections();
-            setConnectedProfiles(profiles);
+            setConnectedProfiles(profiles || []);
         } catch (error) {
             console.error('Failed to fetch connected profiles:', error);
+            setError('Failed to fetch connected profiles. Please try again.');
         }
     };
 
     const handleConnect = async (profile) => {
+        setIsConnecting(true);
+        setError(null);
         try {
-            await window.go.main.App.ConnectSSH(profile);
-            setActiveProfile(profile);
-            fetchConnectedProfiles();
+            console.log('Attempting to connect with profile:', profile);
+            const profileJSON = JSON.stringify(profile);
+            const result = await window.go.main.App.ConnectSSHWithHostKeyCheck(profileJSON);
+            console.log('Connection result:', result);
+            if (result && result.name) {
+                setActiveProfile(result.name);
+                await fetchConnectedProfiles();
+            } else {
+                throw new Error("Connection failed: No valid result returned");
+            }
         } catch (error) {
             console.error('Failed to connect:', error);
+            setError(error.message || "Failed to connect. Please check the server logs for more details.");
+        } finally {
+            setIsConnecting(false);
         }
     };
 
-    const handleDisconnect = async (profile) => {
+    const handleDisconnect = async (profileName) => {
         try {
-            await window.go.main.App.DisconnectSSH(profile);
+            await window.go.main.App.DisconnectSSH(profileName);
             setActiveProfile(null);
-            fetchConnectedProfiles();
+            await fetchConnectedProfiles();
         } catch (error) {
             console.error('Failed to disconnect:', error);
+            setError(error.message || "Failed to disconnect. Please check the server logs for more details.");
         }
     };
 
@@ -49,25 +61,25 @@ export default function App() {
             </header>
             <div className="flex-grow flex overflow-hidden">
                 <aside className="w-1/4 bg-gray-800 p-4 overflow-y-auto">
+                    {error && (
+                        <div className="bg-red-500 text-white p-2 rounded mb-4">
+                            {error}
+                        </div>
+                    )}
                     <ProfileSelector
                         activeProfile={activeProfile}
                         connectedProfiles={connectedProfiles}
                         onConnect={handleConnect}
                         onDisconnect={handleDisconnect}
+                        isConnecting={isConnecting}
                     />
-                    {/*<SavedCommands activeProfile={activeProfile} />*/}
                 </aside>
                 <main className="w-3/4 flex flex-col overflow-hidden">
                     {activeProfile ? (
-                        <>
-                            <div className="flex-grow overflow-hidden">
-                                {/*<Terminal activeProfile={activeProfile} />*/}
-                            </div>
-                            <div className="h-1/3 flex border-t border-gray-700">
-                                {/*<FileBrowser activeProfile={activeProfile} />*/}
-                                {/*<PortForwarding activeProfile={activeProfile} />*/}
-                            </div>
-                        </>
+                        <div className="flex-grow overflow-hidden">
+                            <p>Connected to: {activeProfile}</p>
+                            {/* Add your terminal component here */}
+                        </div>
                     ) : (
                         <div className="flex items-center justify-center h-full">
                             <p className="text-xl text-gray-400">Please select a profile to connect.</p>

@@ -6,10 +6,6 @@ export function AddCommandToHistory(arg1, arg2) {
   return window['go']['main']['App']['AddCommandToHistory'](arg1, arg2);
 }
 
-export function ConnectSSH(arg1) {
-  return window['go']['main']['App']['ConnectSSH'](arg1);
-}
-
 export function ConnectSSHWithHostKeyCheck(arg1) {
   return window['go']['main']['App']['ConnectSSHWithHostKeyCheck'](arg1);
 }
@@ -22,16 +18,8 @@ export function DeleteCustomProfile(arg1) {
   return window['go']['main']['App']['DeleteCustomProfile'](arg1);
 }
 
-export function DeleteFile(arg1, arg2) {
-  return window['go']['main']['App']['DeleteFile'](arg1, arg2);
-}
-
 export function DisconnectSSH(arg1) {
   return window['go']['main']['App']['DisconnectSSH'](arg1);
-}
-
-export function DownloadFile(arg1, arg2, arg3) {
-  return window['go']['main']['App']['DownloadFile'](arg1, arg2, arg3);
 }
 
 export function GetActiveConnections() {
@@ -46,38 +34,10 @@ export function GetCommandHistory(arg1) {
   return window['go']['main']['App']['GetCommandHistory'](arg1);
 }
 
-export function ListDirectory(arg1, arg2) {
-  return window['go']['main']['App']['ListDirectory'](arg1, arg2);
-}
-
-export function LoadCustomProfiles() {
-  return window['go']['main']['App']['LoadCustomProfiles']();
-}
-
 export function LoadProfiles() {
   return window['go']['main']['App']['LoadProfiles']();
 }
 
-export function LoadYAMLConfig(arg1) {
-  return window['go']['main']['App']['LoadYAMLConfig'](arg1);
-}
-
-export function LoadYAMLConfigs() {
-  return window['go']['main']['App']['LoadYAMLConfigs']();
-}
-
-export function PortForward(arg1, arg2, arg3) {
-  return window['go']['main']['App']['PortForward'](arg1, arg2, arg3);
-}
-
-export function RenameFile(arg1, arg2, arg3) {
-  return window['go']['main']['App']['RenameFile'](arg1, arg2, arg3);
-}
-
 export function SaveCustomProfile(arg1) {
   return window['go']['main']['App']['SaveCustomProfile'](arg1);
-}
-
-export function UploadFile(arg1, arg2, arg3) {
-  return window['go']['main']['App']['UploadFile'](arg1, arg2, arg3);
 }
