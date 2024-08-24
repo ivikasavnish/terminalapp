@@ -30,6 +30,10 @@ export function GetActiveConnections() {
   return window['go']['main']['App']['GetActiveConnections']();
 }
 
+export function GetActivePortForwards(arg1) {
+  return window['go']['main']['App']['GetActivePortForwards'](arg1);
+}
+
 export function GetBaseProfile() {
   return window['go']['main']['App']['GetBaseProfile']();
 }
@@ -42,10 +46,18 @@ export function LoadProfiles() {
   return window['go']['main']['App']['LoadProfiles']();
 }
 
+export function PortForward(arg1, arg2, arg3, arg4) {
+  return window['go']['main']['App']['PortForward'](arg1, arg2, arg3, arg4);
+}
+
 export function SaveCustomProfile(arg1) {
   return window['go']['main']['App']['SaveCustomProfile'](arg1);
 }
 
 export function StopInteractiveCommand(arg1) {
   return window['go']['main']['App']['StopInteractiveCommand'](arg1);
+}
+
+export function StopPortForward(arg1, arg2, arg3, arg4) {
+  return window['go']['main']['App']['StopPortForward'](arg1, arg2, arg3, arg4);
 }

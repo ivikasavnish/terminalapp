@@ -3,3 +3,5 @@ Ping 8.8.8.8
 ping 8.8.8.8
 top
 clear
+ls
+sudo apt update -y

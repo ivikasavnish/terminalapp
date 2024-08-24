@@ -16,12 +16,18 @@ export function ExecuteInteractiveCommand(arg1:string,arg2:string):Promise<void>
 
 export function GetActiveConnections():Promise<Array<string>>;
 
+export function GetActivePortForwards(arg1:string):Promise<Array<main.PortForward>>;
+
 export function GetBaseProfile():Promise<main.SSHConfig>;
 
 export function GetCommandHistory(arg1:string):Promise<Array<string>>;
 
 export function LoadProfiles():Promise<Array<main.SSHConfig>>;
 
+export function PortForward(arg1:string,arg2:number,arg3:number,arg4:boolean):Promise<void>;
+
 export function SaveCustomProfile(arg1:main.CustomProfile):Promise<void>;
 
 export function StopInteractiveCommand(arg1:string):Promise<void>;
+
+export function StopPortForward(arg1:string,arg2:number,arg3:number,arg4:boolean):Promise<void>;

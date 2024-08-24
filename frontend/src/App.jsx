@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ProfileSelector } from './profileselector.jsx';
 import { Terminal } from './terminal.jsx';
+import { PortForwarding } from './portforwarding.jsx';
+import { FaTerminal, FaExchangeAlt, FaServer, FaSignOutAlt, FaExclamationTriangle } from 'react-icons/fa';
 
 export default function App() {
     const [activeProfile, setActiveProfile] = useState(null);
@@ -26,10 +28,8 @@ export default function App() {
         setIsConnecting(true);
         setError(null);
         try {
-            console.log('Attempting to connect with profile:', profile);
             const profileJSON = JSON.stringify(profile);
             const result = await window.go.main.App.ConnectSSHWithHostKeyCheck(profileJSON);
-            console.log('Connection result:', result);
             if (result && result.name) {
                 setActiveProfile(result.name);
                 await fetchConnectedProfiles();
@@ -56,38 +56,66 @@ export default function App() {
     };
 
     return (
-        <div className="flex flex-col h-screen bg-gray-900 text-gray-200">
-            <header className="bg-blue-600 text-white p-4">
-                <h1 className="text-2xl font-bold">SSH Client</h1>
-            </header>
-            <div className="flex-grow flex overflow-hidden">
-                <aside className="w-1/4 bg-gray-800 p-4 overflow-y-auto">
-                    {error && (
-                        <div className="bg-red-500 text-white p-2 rounded mb-4">
-                            {error}
+        <div className="flex h-screen bg-gray-900 text-gray-200">
+            <aside className="w-1/4 bg-gray-800 p-4 flex flex-col">
+                <h1 className="text-2xl font-bold mb-4">SSH Client</h1>
+                <ProfileSelector
+                    activeProfile={activeProfile}
+                    connectedProfiles={connectedProfiles}
+                    onConnect={handleConnect}
+                    onDisconnect={handleDisconnect}
+                    isConnecting={isConnecting}
+                />
+            </aside>
+            <main className="flex-1 flex flex-col">
+                {error && (
+                    <div className="bg-red-500 text-white p-2 flex items-center">
+                        <FaExclamationTriangle className="mr-2" />
+                        {error}
+                    </div>
+                )}
+                {activeProfile ? (
+                    <>
+                        <header className="bg-gray-700 p-4 flex justify-between items-center">
+                            <div className="flex items-center">
+                                <FaServer className="mr-2" />
+                                <span className="font-semibold">{activeProfile}</span>
+                            </div>
+                            <button
+                                onClick={() => handleDisconnect(activeProfile)}
+                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200 flex items-center"
+                            >
+                                <FaSignOutAlt className="mr-2" />
+                                Disconnect
+                            </button>
+                        </header>
+                        <div className="flex-1 flex">
+                            <div className="w-2/3 border-r border-gray-700">
+                                <div className="bg-gray-800 p-2">
+                                    <h2 className="text-lg font-semibold flex items-center">
+                                        <FaTerminal className="mr-2" />
+                                        Terminal
+                                    </h2>
+                                </div>
+                                <Terminal activeProfile={activeProfile} />
+                            </div>
+                            <div className="w-1/3">
+                                <div className="bg-gray-800 p-2">
+                                    <h2 className="text-lg font-semibold flex items-center">
+                                        <FaExchangeAlt className="mr-2" />
+                                        Port Forwarding
+                                    </h2>
+                                </div>
+                                <PortForwarding activeProfile={activeProfile} />
+                            </div>
                         </div>
-                    )}
-                    <ProfileSelector
-                        activeProfile={activeProfile}
-                        connectedProfiles={connectedProfiles}
-                        onConnect={handleConnect}
-                        onDisconnect={handleDisconnect}
-                        isConnecting={isConnecting}
-                    />
-                </aside>
-                <main className="w-3/4 flex flex-col overflow-hidden">
-                    {activeProfile ? (
-                        <div className="flex-grow overflow-hidden">
-                            <p>Connected to: {activeProfile}</p>
-                           <Terminal activeProfile={activeProfile} />
-                        </div>
-                    ) : (
-                        <div className="flex items-center justify-center h-full">
-                            <p className="text-xl text-gray-400">Please select a profile to connect.</p>
-                        </div>
-                    )}
-                </main>
-            </div>
+                    </>
+                ) : (
+                    <div className="flex-1 flex items-center justify-center">
+                        <p className="text-xl text-gray-400">Please select a profile to connect.</p>
+                    </div>
+                )}
+            </main>
         </div>
     );
 }

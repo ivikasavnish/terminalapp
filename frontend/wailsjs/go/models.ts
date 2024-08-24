@@ -38,6 +38,22 @@ export namespace main {
 	        this.password = source["password"];
 	    }
 	}
+	export class PortForward {
+	    localPort: number;
+	    remotePort: number;
+	    isRemoteToLocal: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new PortForward(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.localPort = source["localPort"];
+	        this.remotePort = source["remotePort"];
+	        this.isRemoteToLocal = source["isRemoteToLocal"];
+	    }
+	}
 	export class SSHConfig {
 	    name: string;
 	    host: string;
