@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaPlay, FaStop } from 'react-icons/fa';
+import { FaPlay, FaStop, FaTrash } from 'react-icons/fa';
 
 export function Terminal({ activeProfile }) {
     const [output, setOutput] = useState([]);
@@ -11,19 +11,24 @@ export function Terminal({ activeProfile }) {
     const inputRef = useRef(null);
 
     useEffect(() => {
-        const handleCommandOutput = (data) => {
-            if (data.profile === activeProfile) {
-                setOutput(prev => [...prev, { type: data.type, content: data.data }]);
-                if (data.type === 'info' && (data.data.includes('Command finished') || data.data.includes('Command stopped'))) {
+        const handleCommandOutput = (event) => {
+            if (event.profile === activeProfile) {
+                if (event.type === 'clear') {
+                    setOutput([]);
+                } else {
+                    setOutput(prev => [...prev, { type: event.type, content: event.data }]);
+                }
+                if (event.type === 'info' && (event.data.includes('Command finished') || event.data.includes('Command stopped'))) {
                     setIsRunning(false);
                 }
-                if (data.type === 'error') {
+                if (event.type === 'error') {
                     setIsRunning(false);
                 }
             }
         };
 
         window.runtime.EventsOn("command_output", handleCommandOutput);
+
         loadCommandHistory();
 
         return () => {
@@ -43,6 +48,7 @@ export function Terminal({ activeProfile }) {
             setCommandHistory(history);
         } catch (error) {
             console.error('Failed to load command history:', error);
+            setOutput(prev => [...prev, { type: 'error', content: `Failed to load command history: ${error.message}` }]);
         }
     };
 
@@ -74,15 +80,20 @@ export function Terminal({ activeProfile }) {
         setOutput(prev => [...prev, { type: 'input', content: input }]);
         setIsRunning(true);
 
-        try {
-            await window.go.main.App.ExecuteInteractiveCommand(activeProfile, input);
-            await window.go.main.App.AddCommandToHistory(activeProfile, input);
-            setCommandHistory(prev => [input, ...prev]);
-            setHistoryIndex(-1);
-            await createSynonym(input);
-        } catch (error) {
-            setOutput(prev => [...prev, { type: 'error', content: `Failed to execute command: ${error.message}` }]);
+        if (input.trim().toLowerCase() === 'clear') {
+            setOutput([]);
             setIsRunning(false);
+        } else {
+            try {
+                await window.go.main.App.ExecuteInteractiveCommand(activeProfile, input);
+                await window.go.main.App.AddCommandToHistory(activeProfile, input);
+                setCommandHistory(prev => [input, ...prev]);
+                setHistoryIndex(-1);
+            } catch (error) {
+                console.error('Failed to execute command:', error);
+                setOutput(prev => [...prev, { type: 'error', content: `Failed to execute command: ${error.message}` }]);
+                setIsRunning(false);
+            }
         }
 
         setInput('');
@@ -90,22 +101,32 @@ export function Terminal({ activeProfile }) {
 
     const stopCommand = async () => {
         try {
+            setOutput(prev => [...prev, { type: 'info', content: 'Stopping command...' }]);
             await window.go.main.App.StopInteractiveCommand(activeProfile);
+            setOutput(prev => [...prev, { type: 'info', content: 'Command stopped' }]);
+            setIsRunning(false);
         } catch (error) {
             console.error('Failed to stop command:', error);
             setOutput(prev => [...prev, { type: 'error', content: `Failed to stop command: ${error.message}` }]);
-            setIsRunning(false);
         }
     };
 
-    const createSynonym = async (command) => {
-        try {
-            const synonym = await window.go.main.App.CreateSynonym(command);
-            if (synonym) {
-                setOutput(prev => [...prev, { type: 'info', content: `Created synonym: ${synonym} for command: ${command}` }]);
-            }
-        } catch (error) {
-            console.error('Failed to create synonym:', error);
+    const clearTerminal = () => {
+        setOutput([]);
+    };
+
+    const getOutputClassName = (type) => {
+        switch (type) {
+            case 'input':
+                return 'text-blue-400';
+            case 'error':
+                return 'text-red-400';
+            case 'stderr':
+                return 'text-yellow-400';
+            case 'info':
+                return 'text-green-400';
+            default:
+                return 'text-gray-300';
         }
     };
 
@@ -113,12 +134,7 @@ export function Terminal({ activeProfile }) {
         <div className="flex flex-col h-full bg-gray-900 text-gray-300 font-mono">
             <div ref={outputRef} className="flex-grow overflow-auto p-2">
                 {output.map((item, index) => (
-                    <div key={index} className={`mb-1 ${
-                        item.type === 'input' ? 'text-blue-400' :
-                            item.type === 'error' ? 'text-red-400' :
-                                item.type === 'stderr' ? 'text-yellow-400' :
-                                    'text-gray-300'
-                    }`}>
+                    <div key={index} className={`mb-1 ${getOutputClassName(item.type)}`}>
                         {item.type === 'input' ? '$ ' : ''}{item.content}
                     </div>
                 ))}
@@ -142,12 +158,20 @@ export function Terminal({ activeProfile }) {
                         <FaStop className="mr-2 inline" /> Stop
                     </button>
                 ) : (
-                    <button
-                        onClick={executeCommand}
-                        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200"
-                    >
-                        <FaPlay className="mr-2 inline" /> Run
-                    </button>
+                    <>
+                        <button
+                            onClick={executeCommand}
+                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-200 mr-2"
+                        >
+                            <FaPlay className="mr-2 inline" /> Run
+                        </button>
+                        <button
+                            onClick={clearTerminal}
+                            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition duration-200"
+                        >
+                            <FaTrash className="mr-2 inline" /> Clear
+                        </button>
+                    </>
                 )}
             </div>
         </div>

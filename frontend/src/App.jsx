@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ProfileSelector } from './profileselector.jsx';
+import { Terminal } from './terminal.jsx';
 
 export default function App() {
     const [activeProfile, setActiveProfile] = useState(null);
@@ -78,7 +79,7 @@ export default function App() {
                     {activeProfile ? (
                         <div className="flex-grow overflow-hidden">
                             <p>Connected to: {activeProfile}</p>
-                            {/* Add your terminal component here */}
+                           <Terminal activeProfile={activeProfile} />
                         </div>
                     ) : (
                         <div className="flex items-center justify-center h-full">

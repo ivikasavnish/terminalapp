@@ -22,6 +22,10 @@ export function DisconnectSSH(arg1) {
   return window['go']['main']['App']['DisconnectSSH'](arg1);
 }
 
+export function ExecuteInteractiveCommand(arg1, arg2) {
+  return window['go']['main']['App']['ExecuteInteractiveCommand'](arg1, arg2);
+}
+
 export function GetActiveConnections() {
   return window['go']['main']['App']['GetActiveConnections']();
 }
@@ -40,4 +44,8 @@ export function LoadProfiles() {
 
 export function SaveCustomProfile(arg1) {
   return window['go']['main']['App']['SaveCustomProfile'](arg1);
+}
+
+export function StopInteractiveCommand(arg1) {
+  return window['go']['main']['App']['StopInteractiveCommand'](arg1);
 }

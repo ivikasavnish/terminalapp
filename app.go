@@ -11,7 +11,6 @@ import (
 	"os/user"
 	"path/filepath"
 	"strconv"
-	"sync"
 	"time"
 
 	"golang.org/x/crypto/ssh"
@@ -22,18 +21,6 @@ type App struct {
 	ctx            context.Context
 	configPath     string
 	connectionPool *SSHConnectionPool
-}
-
-// SSHConnectionPool manages SSH connections
-type SSHConnectionPool struct {
-	connections map[string]*SSHConnection
-	mu          sync.Mutex
-}
-
-// SSHConnection represents an active SSH connection
-type SSHConnection struct {
-	Client   *ssh.Client
-	LastUsed time.Time
 }
 
 type SSHConfig struct {
