@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ProfileSelector } from './ProfileSelector';
-import { Terminal } from './Terminal';
-import { PortForwarding } from './PortForwarding';
-import { FileBrowser } from './FileBrowser';
-import { SavedCommands } from './SavedCommands';
+import { ProfileSelector } from './profileselector.jsx';
+import { Terminal } from './terminal.jsx';
+import { PortForwarding } from './portforwarding.jsx';
+import { FileBrowser } from './filebrowser.jsx';
+import { SavedCommands } from './savedCommands.jsx';
 import { FaTerminal, FaExchangeAlt, FaServer, FaSignOutAlt, FaExclamationTriangle, FaFolder } from 'react-icons/fa';
 
 export default function App() {
