@@ -5,3 +5,10 @@ top
 clear
 ls
 sudo apt update -y
+ps
+ps aux
+man
+man man
+cat —help
+cat
+ls

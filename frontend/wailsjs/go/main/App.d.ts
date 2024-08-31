@@ -10,9 +10,17 @@ export function CreateSynonym(arg1:string):Promise<string>;
 
 export function DeleteCustomProfile(arg1:string):Promise<void>;
 
+export function DeleteRemoteFile(arg1:string,arg2:string):Promise<void>;
+
+export function DeleteSavedCommand(arg1:string):Promise<void>;
+
 export function DisconnectSSH(arg1:string):Promise<void>;
 
+export function DownloadFile(arg1:string,arg2:string,arg3:string):Promise<void>;
+
 export function ExecuteInteractiveCommand(arg1:string,arg2:string):Promise<void>;
+
+export function ExecuteSavedCommand(arg1:string,arg2:string):Promise<void>;
 
 export function GetActiveConnections():Promise<Array<string>>;
 
@@ -22,12 +30,24 @@ export function GetBaseProfile():Promise<main.SSHConfig>;
 
 export function GetCommandHistory(arg1:string):Promise<Array<string>>;
 
+export function ListDirectory(arg1:string,arg2:string):Promise<Array<main.FileInfo>>;
+
+export function ListSavedCommands():Promise<Array<main.SavedCommand>>;
+
 export function LoadProfiles():Promise<Array<main.SSHConfig>>;
+
+export function OpenFileDialog():Promise<string>;
 
 export function PortForward(arg1:string,arg2:number,arg3:number,arg4:boolean):Promise<void>;
 
+export function SaveCommand(arg1:string,arg2:string):Promise<void>;
+
 export function SaveCustomProfile(arg1:main.CustomProfile):Promise<void>;
+
+export function SaveFileDialog(arg1:string):Promise<string>;
 
 export function StopInteractiveCommand(arg1:string):Promise<void>;
 
 export function StopPortForward(arg1:string,arg2:number,arg3:number,arg4:boolean):Promise<void>;
+
+export function UploadFile(arg1:string,arg2:string,arg3:string):Promise<void>;

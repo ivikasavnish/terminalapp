@@ -6,27 +6,20 @@ export function SavedCommands({ activeProfile }) {
     const [newCommandName, setNewCommandName] = useState('');
     const [newCommandContent, setNewCommandContent] = useState('');
     const [error, setError] = useState(null);
+    const [isExecuting, setIsExecuting] = useState(false);
 
     useEffect(() => {
         fetchSavedCommands();
-    }, [activeProfile]);
+    }, []);
 
     const fetchSavedCommands = async () => {
         try {
             const savedCommands = await window.go.main.App.ListSavedCommands();
-            if (Array.isArray(savedCommands)) {
-                setCommands(savedCommands);
-            } else if (typeof savedCommands === 'object') {
-                // If it's an object, convert it to an array
-                setCommands(Object.entries(savedCommands).map(([name, command]) => ({ Name: name, Command: command })));
-            } else {
-                throw new Error('Unexpected data structure for saved commands');
-            }
+            setCommands(savedCommands);
             setError(null);
         } catch (error) {
             console.error('Failed to fetch saved commands:', error);
             setError('Failed to load saved commands. Please try again.');
-            setCommands([]);
         }
     };
 
@@ -46,21 +39,26 @@ export function SavedCommands({ activeProfile }) {
     };
 
     const handleExecuteCommand = async (commandName) => {
+        if (!activeProfile) {
+            setError('Please connect to a profile before executing commands.');
+            return;
+        }
+
+        setIsExecuting(true);
         try {
-            const result = await window.go.main.App.ExecuteSavedCommand(activeProfile, commandName);
-            console.log('Command execution result:', result);
-            // You might want to update the Terminal component with this result
-            // or display it in some way to the user
+            await window.go.main.App.ExecuteSavedCommand(activeProfile, commandName);
             setError(null);
         } catch (error) {
             console.error('Failed to execute saved command:', error);
             setError('Failed to execute command. Please try again.');
+        } finally {
+            setIsExecuting(false);
         }
     };
 
-    const handleDeleteCommand = async (commandName) => {
+    const handleDeleteCommand = async (name) => {
         try {
-            await window.go.main.App.DeleteSavedCommand(commandName);
+            await window.go.main.App.DeleteSavedCommand(name);
             fetchSavedCommands();
             setError(null);
         } catch (error) {
@@ -70,57 +68,58 @@ export function SavedCommands({ activeProfile }) {
     };
 
     return (
-        <div className="mt-4">
-            <h2 className="text-xl font-bold mb-2">Saved Commands</h2>
-            {error && <div className="text-red-500 mb-2">{error}</div>}
-            <div className="mb-4">
+        <div className="mt-4 bg-gray-800 p-4 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold mb-4 text-gray-200">Saved Commands</h2>
+            {error && <div className="bg-red-500 text-white p-2 mb-4 rounded">{error}</div>}
+            <div className="mb-4 flex flex-col space-y-2">
                 <input
                     type="text"
                     placeholder="Command Name"
                     value={newCommandName}
                     onChange={(e) => setNewCommandName(e.target.value)}
-                    className="mr-2 p-1 border"
+                    className="p-2 border rounded bg-gray-700 text-white"
                 />
-                <input
-                    type="text"
+                <textarea
                     placeholder="Command Content"
                     value={newCommandContent}
                     onChange={(e) => setNewCommandContent(e.target.value)}
-                    className="mr-2 p-1 border"
+                    className="p-2 border rounded bg-gray-700 text-white h-24"
                 />
                 <button
                     onClick={handleSaveCommand}
-                    className="bg-green-500 text-white px-2 py-1 rounded"
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition duration-300 flex items-center justify-center"
                 >
-                    <FaSave className="inline mr-1" /> Save Command
+                    <FaSave className="mr-2" /> Save Command
                 </button>
             </div>
-            {Array.isArray(commands) && commands.length > 0 ? (
-                <ul>
+            {commands.length > 0 ? (
+                <ul className="space-y-2">
                     {commands.map((command) => (
-                        <li key={command.Name} className="flex items-center justify-between mb-2 p-2 bg-gray-100 rounded">
-              <span className="mr-2">
-                <strong>{command.Name}:</strong> {command.Command}
-              </span>
+                        <li key={command.name} className="bg-gray-700 p-3 rounded flex items-center justify-between">
                             <div>
+                                <span className="font-bold text-gray-200">{command.name}</span>
+                                <p className="text-gray-400 text-sm mt-1">{command.command}</p>
+                            </div>
+                            <div className="flex space-x-2">
                                 <button
-                                    onClick={() => handleExecuteCommand(command.Name)}
-                                    className="bg-blue-500 text-white px-2 py-1 rounded mr-2"
+                                    onClick={() => handleExecuteCommand(command.name)}
+                                    disabled={isExecuting}
+                                    className={`bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition duration-300 ${isExecuting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
-                                    <FaPlay className="inline mr-1" /> Execute
+                                    <FaPlay />
                                 </button>
                                 <button
-                                    onClick={() => handleDeleteCommand(command.Name)}
-                                    className="bg-red-500 text-white px-2 py-1 rounded"
+                                    onClick={() => handleDeleteCommand(command.name)}
+                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition duration-300"
                                 >
-                                    <FaTrash className="inline mr-1" /> Delete
+                                    <FaTrash />
                                 </button>
                             </div>
                         </li>
                     ))}
                 </ul>
             ) : (
-                <p>No saved commands found.</p>
+                <p className="text-gray-400">No saved commands found.</p>
             )}
         </div>
     );

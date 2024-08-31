@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { ProfileSelector } from './profileselector.jsx';
-import { Terminal } from './terminal.jsx';
-import { PortForwarding } from './portforwarding.jsx';
-import { FaTerminal, FaExchangeAlt, FaServer, FaSignOutAlt, FaExclamationTriangle } from 'react-icons/fa';
+import { ProfileSelector } from './ProfileSelector';
+import { Terminal } from './Terminal';
+import { PortForwarding } from './PortForwarding';
+import { FileBrowser } from './FileBrowser';
+import { SavedCommands } from './SavedCommands';
+import { FaTerminal, FaExchangeAlt, FaServer, FaSignOutAlt, FaExclamationTriangle, FaFolder } from 'react-icons/fa';
 
 export default function App() {
     const [activeProfile, setActiveProfile] = useState(null);
     const [connectedProfiles, setConnectedProfiles] = useState([]);
     const [isConnecting, setIsConnecting] = useState(false);
     const [error, setError] = useState(null);
+    const [activeTab, setActiveTab] = useState('terminal');
 
     useEffect(() => {
         fetchConnectedProfiles();
@@ -66,6 +69,7 @@ export default function App() {
                     onDisconnect={handleDisconnect}
                     isConnecting={isConnecting}
                 />
+                <SavedCommands activeProfile={activeProfile} />
             </aside>
             <main className="flex-1 flex flex-col">
                 {error && (
@@ -81,33 +85,41 @@ export default function App() {
                                 <FaServer className="mr-2" />
                                 <span className="font-semibold">{activeProfile}</span>
                             </div>
-                            <button
-                                onClick={() => handleDisconnect(activeProfile)}
-                                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200 flex items-center"
-                            >
-                                <FaSignOutAlt className="mr-2" />
-                                Disconnect
-                            </button>
+                            <div className="flex">
+                                <button
+                                    onClick={() => setActiveTab('terminal')}
+                                    className={`mr-2 px-4 py-2 rounded ${activeTab === 'terminal' ? 'bg-blue-500' : 'bg-gray-600'}`}
+                                >
+                                    <FaTerminal className="mr-2 inline" />
+                                    Terminal
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('portForwarding')}
+                                    className={`mr-2 px-4 py-2 rounded ${activeTab === 'portForwarding' ? 'bg-blue-500' : 'bg-gray-600'}`}
+                                >
+                                    <FaExchangeAlt className="mr-2 inline" />
+                                    Port Forwarding
+                                </button>
+                                <button
+                                    onClick={() => setActiveTab('fileBrowser')}
+                                    className={`mr-2 px-4 py-2 rounded ${activeTab === 'fileBrowser' ? 'bg-blue-500' : 'bg-gray-600'}`}
+                                >
+                                    <FaFolder className="mr-2 inline" />
+                                    File Browser
+                                </button>
+                                <button
+                                    onClick={() => handleDisconnect(activeProfile)}
+                                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-200 flex items-center"
+                                >
+                                    <FaSignOutAlt className="mr-2" />
+                                    Disconnect
+                                </button>
+                            </div>
                         </header>
-                        <div className="flex-1 flex">
-                            <div className="w-2/3 border-r border-gray-700">
-                                <div className="bg-gray-800 p-2">
-                                    <h2 className="text-lg font-semibold flex items-center">
-                                        <FaTerminal className="mr-2" />
-                                        Terminal
-                                    </h2>
-                                </div>
-                                <Terminal activeProfile={activeProfile} />
-                            </div>
-                            <div className="w-1/3">
-                                <div className="bg-gray-800 p-2">
-                                    <h2 className="text-lg font-semibold flex items-center">
-                                        <FaExchangeAlt className="mr-2" />
-                                        Port Forwarding
-                                    </h2>
-                                </div>
-                                <PortForwarding activeProfile={activeProfile} />
-                            </div>
+                        <div className="flex-1 overflow-hidden">
+                            {activeTab === 'terminal' && <Terminal activeProfile={activeProfile} />}
+                            {activeTab === 'portForwarding' && <PortForwarding activeProfile={activeProfile} />}
+                            {activeTab === 'fileBrowser' && <FileBrowser activeProfile={activeProfile} />}
                         </div>
                     </>
                 ) : (

@@ -38,6 +38,22 @@ export namespace main {
 	        this.password = source["password"];
 	    }
 	}
+	export class FileInfo {
+	    name: string;
+	    size: number;
+	    isDir: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new FileInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.size = source["size"];
+	        this.isDir = source["isDir"];
+	    }
+	}
 	export class PortForward {
 	    localPort: number;
 	    remotePort: number;
@@ -74,6 +90,20 @@ export namespace main {
 	        this.username = source["username"];
 	        this.password = source["password"];
 	        this.ssh_key_path = source["ssh_key_path"];
+	    }
+	}
+	export class SavedCommand {
+	    name: string;
+	    command: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new SavedCommand(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.name = source["name"];
+	        this.command = source["command"];
 	    }
 	}
 

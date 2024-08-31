@@ -18,12 +18,28 @@ export function DeleteCustomProfile(arg1) {
   return window['go']['main']['App']['DeleteCustomProfile'](arg1);
 }
 
+export function DeleteRemoteFile(arg1, arg2) {
+  return window['go']['main']['App']['DeleteRemoteFile'](arg1, arg2);
+}
+
+export function DeleteSavedCommand(arg1) {
+  return window['go']['main']['App']['DeleteSavedCommand'](arg1);
+}
+
 export function DisconnectSSH(arg1) {
   return window['go']['main']['App']['DisconnectSSH'](arg1);
 }
 
+export function DownloadFile(arg1, arg2, arg3) {
+  return window['go']['main']['App']['DownloadFile'](arg1, arg2, arg3);
+}
+
 export function ExecuteInteractiveCommand(arg1, arg2) {
   return window['go']['main']['App']['ExecuteInteractiveCommand'](arg1, arg2);
+}
+
+export function ExecuteSavedCommand(arg1, arg2) {
+  return window['go']['main']['App']['ExecuteSavedCommand'](arg1, arg2);
 }
 
 export function GetActiveConnections() {
@@ -42,16 +58,36 @@ export function GetCommandHistory(arg1) {
   return window['go']['main']['App']['GetCommandHistory'](arg1);
 }
 
+export function ListDirectory(arg1, arg2) {
+  return window['go']['main']['App']['ListDirectory'](arg1, arg2);
+}
+
+export function ListSavedCommands() {
+  return window['go']['main']['App']['ListSavedCommands']();
+}
+
 export function LoadProfiles() {
   return window['go']['main']['App']['LoadProfiles']();
+}
+
+export function OpenFileDialog() {
+  return window['go']['main']['App']['OpenFileDialog']();
 }
 
 export function PortForward(arg1, arg2, arg3, arg4) {
   return window['go']['main']['App']['PortForward'](arg1, arg2, arg3, arg4);
 }
 
+export function SaveCommand(arg1, arg2) {
+  return window['go']['main']['App']['SaveCommand'](arg1, arg2);
+}
+
 export function SaveCustomProfile(arg1) {
   return window['go']['main']['App']['SaveCustomProfile'](arg1);
+}
+
+export function SaveFileDialog(arg1) {
+  return window['go']['main']['App']['SaveFileDialog'](arg1);
 }
 
 export function StopInteractiveCommand(arg1) {
@@ -60,4 +96,8 @@ export function StopInteractiveCommand(arg1) {
 
 export function StopPortForward(arg1, arg2, arg3, arg4) {
   return window['go']['main']['App']['StopPortForward'](arg1, arg2, arg3, arg4);
+}
+
+export function UploadFile(arg1, arg2, arg3) {
+  return window['go']['main']['App']['UploadFile'](arg1, arg2, arg3);
 }

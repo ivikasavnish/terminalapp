@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FaFolder, FaFile, FaArrowUp, FaDownload, FaTrash, FaUpload } from 'react-icons/fa';
 
 export function FileBrowser({ activeProfile }) {
@@ -7,27 +7,9 @@ export function FileBrowser({ activeProfile }) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(null);
-    const [downloadProgress, setDownloadProgress] = useState(null);
-    const [pathInput, setPathInput] = useState('/');
-    const fileInputRef = useRef(null);
 
-    useEffect(() => {
-        fetchFiles();
-        const unsubscribe = window.runtime.EventsOn("file_progress", handleFileProgress);
-        return () => {
-            unsubscribe();
-        };
-    }, [currentPath, activeProfile]);
-
-    const handleFileProgress = (data) => {
-        if (data.operation === 'upload') {
-            setUploadProgress({ filename: data.filename, progress: data.progress });
-        } else if (data.operation === 'download') {
-            setDownloadProgress({ filename: data.filename, progress: data.progress });
-        }
-    };
-
-    const fetchFiles = async () => {
+    const fetchFiles = useCallback(async () => {
+        if (!activeProfile) return;
         setIsLoading(true);
         try {
             const fileList = await window.go.main.App.ListDirectory(activeProfile, currentPath);
@@ -37,15 +19,33 @@ export function FileBrowser({ activeProfile }) {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [activeProfile, currentPath]);
+
+    useEffect(() => {
+        fetchFiles();
+    }, [fetchFiles]);
+
+    useEffect(() => {
+        const unsubscribe = window.runtime.EventsOn("upload_progress", (data) => {
+            setUploadProgress(data);
+        });
+        return () => unsubscribe();
+    }, []);
 
     const handleFileClick = (file) => {
         if (file.isDir) {
             setCurrentPath(prev => `${prev}${file.name}/`);
-            setPathInput(`${currentPath}${file.name}/`);
         } else {
             setSelectedFile(file === selectedFile ? null : file);
         }
+    };
+
+    const handleParentDirectory = () => {
+        setCurrentPath(prev => {
+            const parts = prev.split('/').filter(Boolean);
+            parts.pop();
+            return `/${parts.join('/')}/`;
+        });
     };
 
     const handleUpload = async () => {
@@ -53,18 +53,20 @@ export function FileBrowser({ activeProfile }) {
         if (result) {
             const fileName = result.split('\\').pop().split('/').pop();
             try {
+                setUploadProgress({ filename: fileName, progress: 0 });
                 await window.go.main.App.UploadFile(activeProfile, result, `${currentPath}${fileName}`);
                 fetchFiles();
             } catch (error) {
                 console.error('Failed to upload file:', error);
                 alert(`Failed to upload file: ${error}`);
+            } finally {
+                setUploadProgress(null);
             }
         }
     };
 
     const handleDownload = async () => {
         if (!selectedFile) return;
-
         const result = await window.go.main.App.SaveFileDialog(selectedFile.name);
         if (result) {
             try {
@@ -91,41 +93,23 @@ export function FileBrowser({ activeProfile }) {
         }
     };
 
-    const handleParentDirectory = () => {
-        const newPath = currentPath.split('/').slice(0, -2).join('/') + '/';
-        setCurrentPath(newPath);
-        setPathInput(newPath);
-    };
-
-    const handlePathInputChange = (e) => {
-        setPathInput(e.target.value);
-    };
-
-    const handlePathSubmit = (e) => {
-        e.preventDefault();
-        setCurrentPath(pathInput.endsWith('/') ? pathInput : pathInput + '/');
-    };
-
     return (
         <div className="w-full bg-gray-800 p-4 rounded-lg shadow-md">
             <h2 className="text-xl font-bold mb-4 text-gray-200">File Browser</h2>
-            <form onSubmit={handlePathSubmit} className="flex items-center mb-4 space-x-2">
-                <button type="button" onClick={handleParentDirectory} className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-300">
+            <div className="flex items-center mb-4 space-x-2">
+                <button onClick={handleParentDirectory} className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition duration-300">
                     <FaArrowUp />
                 </button>
                 <input
                     type="text"
-                    value={pathInput}
-                    onChange={handlePathInputChange}
+                    value={currentPath}
+                    readOnly
                     className="flex-grow bg-gray-700 text-white p-2 rounded"
                 />
-                <button type="submit" className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-300">
-                    Go
-                </button>
-                <button type="button" onClick={handleUpload} className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-300">
+                <button onClick={handleUpload} className="bg-green-500 text-white p-2 rounded hover:bg-green-600 transition duration-300">
                     <FaUpload />
                 </button>
-            </form>
+            </div>
             <div className="border border-gray-700 rounded p-2 mb-4 h-64 overflow-y-auto">
                 {isLoading ? (
                     <div className="flex items-center justify-center h-full">
@@ -133,9 +117,9 @@ export function FileBrowser({ activeProfile }) {
                     </div>
                 ) : (
                     <ul className="space-y-1">
-                        {files.map(file => (
+                        {files.map((file, index) => (
                             <li
-                                key={file.name}
+                                key={index}
                                 className={`flex items-center p-2 cursor-pointer hover:bg-gray-700 transition duration-300 ${selectedFile === file ? 'bg-blue-600' : ''}`}
                                 onClick={() => handleFileClick(file)}
                             >
@@ -172,19 +156,6 @@ export function FileBrowser({ activeProfile }) {
                             style={{ width: `${uploadProgress.progress}%` }}
                         >
                             {uploadProgress.progress.toFixed(1)}%
-                        </div>
-                    </div>
-                </div>
-            )}
-            {downloadProgress && (
-                <div className="mt-4">
-                    <p className="text-gray-300">Downloading: {downloadProgress.filename}</p>
-                    <div className="w-full bg-gray-700 rounded">
-                        <div
-                            className="bg-blue-500 text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded"
-                            style={{ width: `${downloadProgress.progress}%` }}
-                        >
-                            {downloadProgress.progress.toFixed(1)}%
                         </div>
                     </div>
                 </div>

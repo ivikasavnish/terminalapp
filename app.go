@@ -18,9 +18,10 @@ import (
 
 // App struct
 type App struct {
-	ctx            context.Context
-	configPath     string
-	connectionPool *SSHConnectionPool
+	ctx                  context.Context
+	savedCommandsManager *SavedCommandsManager
+	configPath           string
+	connectionPool       *SSHConnectionPool
 }
 
 type SSHConfig struct {
@@ -42,8 +43,10 @@ type ConnectionResult struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
+	configPath := "./configs"
 	return &App{
-		configPath: "./configs",
+		configPath:           configPath,
+		savedCommandsManager: NewSavedCommandsManager(configPath),
 		connectionPool: &SSHConnectionPool{
 			connections: make(map[string]*SSHConnection),
 		},
