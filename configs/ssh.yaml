@@ -1,5 +1,0 @@
-ssh_key_path: /Users/vikasavnish/.ssh/LightsailDefaultKey-ap-south-1.pem
-username: ubuntu
-host: '13.232.36.173'
-port: 22
-name: aws_connection
